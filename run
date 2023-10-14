@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+rm -rf results
+mkdir results
+
+for count in 200 500 750 1000
+do
+  for path in read-file-sync read-file-sync-cache
+  do
+    echo "Running test.$path.$count"
+    plow http://localhost:3000 -c $count -d 10s | grep -A 2 -E 'Latency Percentile' | tail -n 1 > results/$path#$count
+  done
+done
+

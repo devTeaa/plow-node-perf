@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="canvas-list">
+  </div>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    async function run () {
+      const canvasList = document.getElementById('canvas-list')
+
+      const { group: pList, data } = await fetch('/read-data').then(res => res.json())
+
+      Object.keys(data).forEach((key) => {
+        const canvas = document.createElement('canvas')
+        canvas.id = `chart-${key}`
+        canvasList.appendChild(canvas)
+
+        new Chart(
+          document.getElementById(`chart-${key}`),
+          {
+            type: 'bar',
+            data: { 
+              datasets: Object.keys(data[key]).map(method => ({
+                label: method,
+                data: pList.map((pValue, pIndex) => ({ x: pValue, y: data[key][method][pIndex] }))
+              }))
+            },
+            options: {
+              plugins: { title: { display: true, text: `RPS ${key}`, font: { size: 32 } } },
+              scales: {
+                x: { title: { display: true, text: 'percentile' } },
+                y: { title: { display: true, text: 'milliseconds' } },
+              }
+            }
+          }
+        )
+      })
+    }
+
+    run()
+  </script>
+</body>
+</html>
